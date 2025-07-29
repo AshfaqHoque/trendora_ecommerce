@@ -1,24 +1,25 @@
 import { Injectable } from '@nestjs/common';
-
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
+import { Admin } from './entities/admin.entity';
 @Injectable()
 export class AdminService {
-    private admins: any[] = [];
-    private idCounter = 1;
+    private admins: Admin[] = [];
 
     findAll() {
         return this.admins;
     }
 
-    create(admin: any) {
-        admin.id = this.idCounter++;
-        this.admins.push(admin);
-        return { message: 'Admin created successfully', admin };
+    create(createAdminDto: CreateAdminDto) {
+        const newAdmin = {id: this.admins.length + 1, ...createAdminDto};
+        this.admins.push(newAdmin);
+        return { message: 'Admin created successfully', admin: newAdmin};
     }
 
-    update(id: number, updatedAdmin: any) {
+    update(id: number, updatedAdminDto: UpdateAdminDto) {
         const index = this.admins.findIndex(admin => admin.id === id);
-        this.admins[index] = { ...this.admins[index], ...updatedAdmin, id };
-        return { message: 'Admin updated successfully', admin: this.admins[index] };
+        this.admins[index] = { ...this.admins[index], ...updatedAdminDto};
+        return { message: 'Admin updated successfully', admin: this.admins[index]};
     }
 
     remove(id: number) {

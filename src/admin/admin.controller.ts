@@ -1,26 +1,24 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AdminService } from './admin.service';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Controller('admin')
 export class AdminController {
     constructor(private readonly adminService: AdminService) {}
-    @Get() // GET /admin
+    @Get() 
     getAllAdmins() {
         return this.adminService.findAll();
     }
-    @Post() // POST /admin
-    createAdmin(@Body() body: any) {
-        return this.adminService.create(body);
+    @Post('addadmin') 
+    createAdmin(@Body() createAdminDto: CreateAdminDto) {
+        return this.adminService.create(createAdminDto);
     }
-    @Put(':id')
-    updateAdmin(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() body: any,
-    ) {
-        return this.adminService.update(id, body);
+    @Put('updateadmin/:id')
+    updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateAdminDto: UpdateAdminDto,) {
+        return this.adminService.update(id, updateAdminDto);
     }
-
-    @Delete(':id')
+    @Delete('deleteadmin/:id')
     deleteAdmin(@Param('id', ParseIntPipe) id: number) {
         return this.adminService.remove(id);
     }
