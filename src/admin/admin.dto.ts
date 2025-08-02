@@ -5,13 +5,15 @@ export class CreateAdminDto {
     @IsNotEmpty()
     @Matches(/^[^0-9]*$/, { message: 'Name should not contain numbers' })
     name : string;
-    @IsEmail()
+    @IsNotEmpty({ message: 'Email field is required' })
+    @IsEmail({}, { message: 'Please enter a valid email address (e.g., john@example.com)' })
     email : string;
+    @IsNotEmpty({ message: 'Password field is required' })
     @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
     password : string;
     @IsDateString({}, {message: 'Date must be in (YYYY-MM-DD) format'})
     joiningDate : string;
-    @Matches(/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9-_%]+\/?$/,{message: 'LinkedIn URL must be a valid profile link (e.g., https://www.linkedin.com/in/username/)'})
+    @Matches(/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9-_%]+\/?$/,{message: 'invalid url'})
     linkedInUrl : string;
 }
 
