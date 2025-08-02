@@ -5,6 +5,7 @@ import { AdminModule } from './admin/admin.module';
 import { SellerModule } from './seller/seller.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomerModule } from './customer/customer.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [AdminModule, CustomerModule, SellerModule, TypeOrmModule.forRoot(
@@ -16,7 +17,7 @@ import { CustomerModule } from './customer/customer.module';
     database: 'trendora_ecommerce',
     autoLoadEntities: true,
     synchronize: true,
-  }),],
+  }), ProductModule,],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -11,14 +11,14 @@ export class AdminService {
         return this.adminRepository.find();
     }
 
-    async create(dto: CreateAdminDto): Promise<{ message: string; admin: AdminEntity}> {
-        const newAdmin = await this.adminRepository.save(dto);
+    async create(createAdminDto: CreateAdminDto): Promise<{ message: string; admin: AdminEntity}> {
+        const newAdmin = await this.adminRepository.save(createAdminDto);
         return { message: 'Admin created successfully', admin: newAdmin};
     }
 
-    async update(id: number, dto: UpdateAdminDto): Promise<{ message: string; admin: AdminEntity }> {
+    async update(id: number, updateAdminDto: UpdateAdminDto): Promise<{ message: string; admin: AdminEntity }> {
         if (!(await this.adminRepository.findOneBy({id}))) throw new NotFoundException(`Admin ${id} not found`);
-        await this.adminRepository.update(id, dto);
+        await this.adminRepository.update(id, updateAdminDto);
         const updatedAdmin = await this.adminRepository.findOneBy({id});
         return { message: 'Admin updated successfully', admin: updatedAdmin! };
     }
