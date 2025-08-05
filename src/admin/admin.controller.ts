@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UsePipes, ValidationPipe, Patch } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto, UpdateAdminDto } from './admin.dto';
+import { CreateAdminDto, UpdateAdminDto, UpdateStatusDto } from './admin.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -24,5 +24,20 @@ export class AdminController {
     @Delete(':id')
     deleteAdmin(@Param('id', ParseIntPipe) id: number) {
         return this.adminService.remove(id);
+    }
+
+    @Patch(':id/status')
+    updateStatus(@Param('id', ParseIntPipe) id: number, @Body() updateStatusDto: UpdateStatusDto) {
+        return this.adminService.updateStatus(id, updateStatusDto);
+    }
+
+    @Get('inactive')
+    getInactiveAdmins() {
+        return this.adminService.findInactive();
+    }
+
+    @Get('olderthan40')
+    getAdminsOlderThan40() {
+        return this.adminService.findOlderThan40();
     }
 }

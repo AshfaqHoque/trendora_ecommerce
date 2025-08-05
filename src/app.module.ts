@@ -8,7 +8,7 @@ import { CustomerModule } from './customer/customer.module';
 import { ProductModule } from './product/product.module';
 
 @Module({
-  imports: [AdminModule, CustomerModule, SellerModule, TypeOrmModule.forRoot(
+  imports: [AdminModule, CustomerModule, SellerModule, ProductModule, TypeOrmModule.forRoot(
   { type: 'postgres',
     host: 'localhost',
     port: 5432,
@@ -17,7 +17,8 @@ import { ProductModule } from './product/product.module';
     database: 'trendora_ecommerce',
     autoLoadEntities: true,
     synchronize: true,
-  }), ProductModule,],
+    //dropSchema: true,
+  }),],
   controllers: [AppController],
   providers: [AppService],
 })
