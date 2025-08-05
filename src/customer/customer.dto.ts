@@ -10,7 +10,7 @@ export class CreateCustomerDto {
   @Matches(/[A-Z]/, { message: 'Password must have at least one uppercase letter' })
   password: string;
 
-  @IsIn(['male', 'female'], { message: 'Gender must be male or female' })
+  @IsIn(['male', 'female','others'], { message: 'Gender must be male or female' })
   gender: string;
 
   @Matches(/^\d+$/, { message: 'Phone number must contain only digits' })

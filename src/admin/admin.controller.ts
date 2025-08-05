@@ -5,19 +5,23 @@ import { CreateAdminDto, UpdateAdminDto } from './admin.dto';
 @Controller('admin')
 export class AdminController {
     constructor(private readonly adminService: AdminService) {}
+
     @Get() 
     getAllAdmins() {
         return this.adminService.findAll();
     }
-    @Post('addadmin') 
+
+    @Post() 
     createAdmin(@Body() createAdminDto: CreateAdminDto) {
         return this.adminService.create(createAdminDto);
     }
-    @Put('updateadmin/:id')
+
+    @Put(':id')
     updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateAdminDto: UpdateAdminDto,) {
         return this.adminService.update(id, updateAdminDto);
     }
-    @Delete('deleteadmin/:id')
+    
+    @Delete(':id')
     deleteAdmin(@Param('id', ParseIntPipe) id: number) {
         return this.adminService.remove(id);
     }

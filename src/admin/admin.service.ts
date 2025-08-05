@@ -1,30 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAdminDto, UpdateAdminDto } from './admin.dto';
-import { Admin } from './admin.entity';
+import { AdminEntity } from './admin.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 @Injectable()
 export class AdminService {
-    private admins: Admin[] = [];
+    constructor(@InjectRepository(AdminEntity) private adminRepository: Repository<AdminEntity>){}
 
-    findAll() {
-        return this.admins;
+    async findAll(): Promise<AdminEntity[]> {
+        return this.adminRepository.find();
     }
 
-    create(createAdminDto: CreateAdminDto) {
-        const newAdmin = {id: this.admins.length + 1, ...createAdminDto};
-        this.admins.push(newAdmin);
+    async create(createAdminDto: CreateAdminDto): Promise<{ message: string; admin: AdminEntity}> {
+        const newAdmin = await this.adminRepository.save(createAdminDto);
         return { message: 'Admin created successfully', admin: newAdmin};
     }
 
-    update(id: number, updatedAdminDto: UpdateAdminDto) {
-        const index = this.admins.findIndex(admin => admin.id === id);
-        this.admins[index] = { ...this.admins[index], ...updatedAdminDto};
-        return { message: 'Admin updated successfully', admin: this.admins[index]};
+    async update(id: number, updateAdminDto: UpdateAdminDto): Promise<{ message: string; admin: AdminEntity }> {
+        if (!(await this.adminRepository.findOneBy({id}))) throw new NotFoundException(`Admin ${id} not found`);
+        await this.adminRepository.update(id, updateAdminDto);
+        const updatedAdmin = await this.adminRepository.findOneBy({id});
+        return { message: 'Admin updated successfully', admin: updatedAdmin! };
     }
 
-    remove(id: number) {
-        const index = this.admins.findIndex(admin => admin.id === id);
-        const removedAdmin = this.admins.splice(index, 1);
-        return { message: 'Admin deleted successfully', admin: removedAdmin[0] };
+    async remove(id: number): Promise<{ message: string; admin: AdminEntity }> {
+        const admin = await this.adminRepository.findOneBy({id});
+        if (!admin) throw new NotFoundException(`Admin ${id} not found`);
+        await this.adminRepository.delete(id);
+        return { message: 'Admin deleted successfully', admin: admin };
     }
     
 }
