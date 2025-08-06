@@ -12,7 +12,7 @@ export class AdminEntity {
   @Column({ type: 'varchar', length: 100})
   fullName: string;
 
-  @Column()
+  @Column({unique: true})
   email: string;
 
   @Column({ type: 'int'})
