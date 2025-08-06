@@ -1,43 +1,29 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, ValidationPipe, UsePipes } from '@nestjs/common';
-// import { CreateCustomerDto } from './dto/createCustomer.dto';
-import { CreateCustomerDto } from './customer.dto';
+import { Controller, Post, Body, Put, Param, Get, Delete } from '@nestjs/common';
 import { CustomerService } from './customer.service';
+//import { CreateCustomerDto } from './dto/create-customer.dto';
+import { CreateCustomerDto } from './customer.dto';
 
-@Controller('customer')
+@Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  // @Post()
-  // create(@Body() body: any) {
-  //   return this.customerService.create(body);
-  // }
-
-  @Get()
-  findAll() {
-    return this.customerService.findAll();
+  @Post()
+  create(@Body() dto: CreateCustomerDto) {
+    return this.customerService.createCustomer(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.customerService.findOne(+id);
+  @Put(':id/phone')
+  updatePhone(@Param('id') id: string, @Body('phone') phone: number) {
+    return this.customerService.updatePhone(id, phone);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() body: any) {
-    return this.customerService.update(+id, body);
+  @Get('null-fullname')
+  getNullFullNames() {
+    return this.customerService.getCustomersWithNullFullName();
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.customerService.remove(+id);
-  }
-
-  @Post()
-  createCustomer(@Body() createCustomerDto: CreateCustomerDto) {
-   
-    return {
-      message: 'User created',
-      data: createCustomerDto,
-    };
+  delete(@Param('id') id: string) {
+    return this.customerService.removeCustomer(id);
   }
 }
