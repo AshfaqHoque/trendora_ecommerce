@@ -1,29 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, IsNull } from 'typeorm';
+import { CustomerEntity } from './customer.entity';
+import { CreateCustomerDto } from './customer.dto';
 
 @Injectable()
 export class CustomerService {
-    private users: any[] = [];
+  constructor(
+    @InjectRepository(CustomerEntity)
+    private readonly customerRepo: Repository<CustomerEntity>,
+  ) {}
 
-    create(data: any) {
-        this.users.push(data);
-        return { message: 'User created', data };
+  async createCustomer(dto: CreateCustomerDto): Promise<CustomerEntity> {
+
+  const customer = this.customerRepo.create(dto);
+  return await this.customerRepo.save(customer);
+}
+
+  async updatePhone(id: string, newPhone: number): Promise<CustomerEntity> {
+    const customer = await this.customerRepo.findOneBy({ id });
+    if (!customer) throw new NotFoundException('Customer not found');
+
+    customer.phone = newPhone;
+    return await this.customerRepo.save(customer);
   }
 
-    findAll() {
-     return this.users;
+  async getCustomersWithNullFullName(): Promise<CustomerEntity[]> {
+    return await this.customerRepo.find({ where: { fullName: IsNull() } });
   }
 
-    findOne(id: number) {
-        return this.users[id] ?? { message: 'User not found' };
-  }
-
-    update(id: number, data: any) {
-        this.users[id] = data;
-        return { message: 'User updated', data };
-  }
-
-    remove(id: number) {
-        this.users.splice(id, 1);
-        return { message: 'User removed' };
+  async removeCustomer(id: string): Promise<string> {
+    const result = await this.customerRepo.delete(id);
+    if (result.affected === 0) throw new NotFoundException('Customer not found');
+    return `Customer with ID ${id} deleted successfully.`;
   }
 }
