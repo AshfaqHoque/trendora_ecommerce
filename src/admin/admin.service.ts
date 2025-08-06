@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAdminDto, UpdateAdminDto } from './admin.dto';
+import { CreateAdminDto, UpdateAdminDto, UpdateStatusDto } from './admin.dto';
 import { AdminEntity } from './admin.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 @Injectable()
 export class AdminService {
     constructor(@InjectRepository(AdminEntity) private adminRepository: Repository<AdminEntity>){}
@@ -28,6 +28,21 @@ export class AdminService {
         if (!admin) throw new NotFoundException(`Admin ${id} not found`);
         await this.adminRepository.delete(id);
         return { message: 'Admin deleted successfully', admin: admin };
+    }
+
+    async updateStatus(id: number, updateStatusDto: UpdateStatusDto): Promise<{message: string; admin: AdminEntity}> {
+        if (!(await this.adminRepository.findOneBy({id}))) throw new NotFoundException(`Admin ${id} not found`);
+        await this.adminRepository.update(id, {status: updateStatusDto.status});
+        const updatedAdmin = await this.adminRepository.findOneBy({id});
+        return { message: 'Status updated successfully', admin: updatedAdmin! };
+    }
+
+    findInactive(): Promise<AdminEntity[]> {
+        return this.adminRepository.find({ where:{status:'inactive'} });
+    }
+
+    findOlderThan40(): Promise<AdminEntity[]> {
+        return this.adminRepository.find({ where:{age: MoreThan(40)} });
     }
     
 }
