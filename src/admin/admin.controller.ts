@@ -11,13 +11,18 @@ export class AdminController {
         return this.adminService.findAll();
     }
 
+    @Get(':id') 
+    getOneAdmin(@Param('id', ParseIntPipe) id: number) {
+        return this.adminService.findOne(id);
+    }
+
     @Post() 
     createAdmin(@Body() createAdminDto: CreateAdminDto) {
         return this.adminService.create(createAdminDto);
     }
 
     @Put(':id')
-    updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateAdminDto: UpdateAdminDto,) {
+    updateAdmin(@Param('id', ParseIntPipe) id: number, @Body() updateAdminDto: UpdateAdminDto) {
         return this.adminService.update(id, updateAdminDto);
     }
     
@@ -31,13 +36,13 @@ export class AdminController {
         return this.adminService.updateStatus(id, updateStatusDto);
     }
 
-    @Get('inactive')
+    @Get('find/inactive')
     getInactiveAdmins() {
         return this.adminService.findInactive();
     }
 
-    @Get('olderthan40')
-    getAdminsOlderThan40() {
-        return this.adminService.findOlderThan40();
-    }
+    @Get('find/olderthan/:age')
+    getAdminsOlderThan(@Param('age', ParseIntPipe) age: number) {
+        return this.adminService.findOlderThan(age);
+    }   
 }
