@@ -54,6 +54,9 @@ export class UpdateAdminDto {
     @Matches(/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9-_%]+\/?$/, {message: 'LinkedIn URL must be a valid profile link (e.g., https://www.linkedin.com/in/username/)',})
     @IsOptional()
     linkedInUrl?: string;
+
+    @IsIn(['active', 'inactive'],{ message: 'status must be either active or inactive'})
+    status: 'active' | 'inactive';
 }
 
 export class UpdateStatusDto {

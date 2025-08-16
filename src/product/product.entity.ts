@@ -10,8 +10,20 @@ export class ProductEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column('decimal', { precision: 10, scale: 2 })
     price: number;
+
+    @Column({ type: 'text', nullable: true })
+    description?: string;
+
+
+    @Column({ type: 'int', default: 0 })
+    stock: number;
+
+
+    @Column({ nullable: true })
+    category: string;
+
 
     @ManyToOne(() => AdminEntity, (admin) => admin.products)
     admin: AdminEntity;
