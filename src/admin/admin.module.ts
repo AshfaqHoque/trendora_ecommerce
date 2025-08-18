@@ -3,10 +3,11 @@ import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminEntity } from './admin.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AdminEntity]),],
+  imports: [TypeOrmModule.forFeature([AdminEntity])],
   controllers: [AdminController],
   providers: [AdminService]
 })

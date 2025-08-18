@@ -25,6 +25,6 @@ export class ProductEntity {
     category: string;
 
 
-    @ManyToOne(() => AdminEntity, (admin) => admin.products)
+    @ManyToOne(() => AdminEntity, (admin) => admin.products, {onDelete: 'SET NULL'})
     admin: AdminEntity;
 }
