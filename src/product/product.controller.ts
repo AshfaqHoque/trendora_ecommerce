@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put, Query, UseGuards, Request } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, CreateProductsDto, UpdateProductDto } from './product.dto';
-import { SessionGuard } from 'src/admin/session.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
-@UseGuards(SessionGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -13,59 +16,84 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @Get('search')
-  searchProductByName(@Query('name') name: string) {
-    return this.productService.searchByName(name);
+  // @Get('search')
+  // searchProductByName(@Query('name') name: string) {
+  //   return this.productService.searchByName(name);
+  // }
+
+  // @Get('price-range')
+  // findProductsByPriceRange(@Query('min', ParseIntPipe) min: number, @Query('max', ParseIntPipe) max:number) {
+  //   return this.productService.findByPriceRange(min,max);
+  // }
+
+  // @Get('top-expensive')
+  // findTopExpensive(@Query('limit') limit?: string) {
+  //   const lim = limit ? parseInt(limit, 10) : 5;
+  //   return this.productService.findTopExpensive(lim);
+  // }
+
+  @Get('my-products') 
+  @Roles(Role.Vendor)
+  getMyProducts(@Request() req) {
+  return this.productService.findByVendor(undefined, req.user);
   }
 
-  @Get('price-range')
-  findProductsByPriceRange(@Query('min', ParseIntPipe) min: number, @Query('max', ParseIntPipe) max:number) {
-    return this.productService.findByPriceRange(min,max);
+  @Get('by-vendor')
+  @Roles(Role.Admin)
+  getProductsByVendor(@Query('id') id: number | undefined, @Request() req) {
+    return this.productService.findByVendor(id, req.user);
   }
 
-  @Get('top-expensive')
-  findTopExpensive(@Query('limit') limit?: string) {
-    const lim = limit ? parseInt(limit, 10) : 5;
-    return this.productService.findTopExpensive(lim);
+  @Get('my-product-counts')
+  @Roles(Role.Vendor)
+  getMyProductCounts(@Request() req) {
+    return this.productService.countByVendor(undefined, req.user);
   }
 
-  @Get('count-by-category')
-  countByCategory() {
-    return this.productService.countByCategory();
+  @Get('counts-by-vendor')
+  @Roles(Role.Admin)
+  getProductCountsByVendor(@Query('id') id: number | undefined, @Request() req) {
+    return this.productService.countByVendor(id, req.user);
   }
 
-  @Get('admin/:adminId')
-  getProducts(@Param('adminId', ParseIntPipe) adminId: number) {
-    return this.productService.findByAdminId(adminId);
-  }
-
-  @Get('category/:category')
-  findProductsByCategory(@Param('category') category: string) {
-    return this.productService.findByCategory(category);
-  }
+  // @Get('category/:category')
+  // findProductsByCategory(@Param('category') category: string) {
+  //   return this.productService.findByCategory(category);
+  // }
 
   @Get(':id') 
   getOneProduct(@Param('id', ParseIntPipe) id: number) {
     return this.productService.findOne(id);
   }
 
-  @Post(':adminId')
-  createProduct(@Param('adminId', ParseIntPipe) adminId: number, @Body() createProductDto: CreateProductDto) {
-    return this.productService.create(adminId, createProductDto);
+  // @Get(':id/vendor')
+  // async findVendorByProduct(@Param('id', ParseIntPipe) id: number) {
+  //   return await this.productService.findVendor(id);
+  // }
+
+  @Post('create')
+  @Roles(Role.Vendor)
+  createProduct(@Body() createProductDto: CreateProductDto, @Request() req) {
+    return this.productService.create(createProductDto, req.user);
   }
 
-  @Post('many/:adminId')
-  createManyProducts(@Param('adminId', ParseIntPipe) adminId: number, @Body() createProductsDto: CreateProductsDto) {
-    return this.productService.createMany(adminId, createProductsDto);
+  @Post('createmany')
+  createManyProducts(@Body() createProductsDto: CreateProductsDto, @Request() req) {
+    return this.productService.createMany(createProductsDto, req.user);
   }
 
-  @Put(':id')
-  updateProduct(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto,) {
-    return this.productService.update(id, updateProductDto);
-  }
+  // @Put('update')
+  // updateProduct(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto, @Request() req) {
+  //   const vendorId = req.user.id;
+  //   return this.productService.update(id, updateProductDto);
+  // }
 
-  @Delete(':id')
-  removeProduct(@Param('id') id: string) {
-    return this.productService.remove(+id);
-  }
+  // @Delete(':id')
+  // removeProduct(@Param('id') id: string) {
+  //   return this.productService.remove(+id);
+  // }
+
+
+
+  
 }

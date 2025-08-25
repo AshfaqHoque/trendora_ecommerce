@@ -1,10 +1,11 @@
-import { CanActivate, ExecutionContext } from "@nestjs/common";
-import { Observable } from "rxjs";
+// import { CanActivate, ExecutionContext } from "@nestjs/common";
+// import { Observable } from "rxjs";
 
 
-export class SessionGuard implements CanActivate {
-    canActivate(context: ExecutionContext): boolean {
-        const request = context.switchToHttp().getRequest();
-        return !!request.session.adminId;
-    }
-}
+// export class SessionGuard implements CanActivate {
+//     canActivate(context: ExecutionContext): boolean {
+//         const request = context.switchToHttp().getRequest();
+//         return !!request.session.adminId;
+//     }
+// }
+export class SessionGuard {}

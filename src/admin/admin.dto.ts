@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, Min } from "class-validator";
+import { IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Length, Matches, MaxLength, Min } from "class-validator";
 
 export class CreateAdminDto {
     @IsString()
@@ -25,6 +25,18 @@ export class CreateAdminDto {
 
     @Matches(/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9-_%]+\/?$/,{message: 'invalid url'})
     linkedInUrl : string;
+}
+
+export class VerifyEmailDto {
+    @IsNotEmpty({ message: 'Email field is required' })
+    @IsEmail({}, { message: 'Please enter a valid email address' })
+    email: string;
+
+    @IsNotEmpty({ message: 'OTP is required' })
+    @IsString()
+    @Length(3, 3, { message: 'OTP must be exactly 3 digits' })
+    @Matches(/^\d{3}$/, { message: 'OTP must contain only numbers' })
+    otp: string;
 }
 
 export class UpdateAdminDto {
@@ -60,15 +72,15 @@ export class UpdateStatusDto {
     status: 'active' | 'inactive';
 }
 
-export class LoginAdminDto {
-    @IsNotEmpty({ message: 'Email field is required' })
-    @IsEmail({}, { message: 'Please enter a valid email address (e.g., john@example.com)' })
-    email : string;
+// export class LoginAdminDto {
+//     @IsNotEmpty({ message: 'Email field is required' })
+//     @IsEmail({}, { message: 'Please enter a valid email address (e.g., john@example.com)' })
+//     email : string;
 
-    @IsNotEmpty({ message: 'Password field is required' })
-    @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
-    password : string;
-}
+//     @IsNotEmpty({ message: 'Password field is required' })
+//     @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
+//     password : string;
+// }
 
 export class UpdatePasswordDto {
     @IsString()

@@ -1,4 +1,4 @@
-import { AdminEntity } from "src/admin/admin.entity";
+import { VendorEntity } from "src/vendor/vendor.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -24,7 +24,6 @@ export class ProductEntity {
     @Column({ nullable: true })
     category: string;
 
-
-    @ManyToOne(() => AdminEntity, (admin) => admin.products, {onDelete: 'SET NULL'})
-    admin: AdminEntity;
+    @ManyToOne(() => VendorEntity, (vendor) => vendor.products, { onDelete: 'SET NULL' })
+    vendor: VendorEntity;
 }
