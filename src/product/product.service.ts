@@ -1,12 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateProductDto, CreateProductDto, CreateProductsDto } from './product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, ILike, Like, Repository } from 'typeorm';
 import { ProductEntity } from './product.entity';
+import { Role } from 'src/auth/enums/role.enum';
+import { VendorEntity } from 'src/vendor/vendor.entity';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>){}
+  constructor(
+    @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
+    @InjectRepository(VendorEntity) private vendorRepository: Repository<VendorEntity>,
+  ){}
   
   findAll(): Promise<ProductEntity[]>{
     return this.productRepository.find();
@@ -18,61 +23,112 @@ export class ProductService {
     return product;
   }
 
-  findByAdminId(adminId: number): Promise<ProductEntity[]> {
-    return this.productRepository.find({ where:{ admin:{ id:adminId } } });
+  async findByVendor(id: number | undefined, user: any): Promise<ProductEntity[]> {
+    if (user.roles.includes(Role.Admin)) {
+      if(id && !(await this.vendorRepository.findOne({where: {id}}))) {
+        throw new NotFoundException(`Vendor with ID ${id} not found`);
+      }
+      const condition = id ? { vendor: { id } } : {};
+      return await this.productRepository.find({
+        where: condition,
+        relations: ['vendor'],
+      });
+    }
+    if (user.roles.includes(Role.Vendor)) {
+      return await this.productRepository.find({
+        where: { vendor: { id: user.id } },
+        relations: ['vendor'],
+      });
+    }
+    throw new ForbiddenException('Access denied');
   }
 
-  countAll():Promise<number> {
-    return this.productRepository.count();
+  async countByVendor(id: number | undefined, user: any): Promise<number> {
+    if (user.roles.includes(Role.Admin)) {
+      if(id && !(await this.vendorRepository.findOne({where: {id}}))) {
+        throw new NotFoundException(`Vendor with ID ${id} not found`);
+      }
+      const condition = id ? { vendor: { id } } : {};
+      return await this.productRepository.count({
+        where: condition,
+      });
+    }
+    if (user.roles.includes(Role.Vendor)) {
+      return await this.productRepository.count({
+        where: { vendor: { id: user.id } },
+      });
+    }
+    throw new ForbiddenException('Access denied');
   }
 
-  async create(adminId: number, createProductDto: CreateProductDto): Promise<{message: string; product: ProductEntity}> {
-    const newProduct = this.productRepository.create({...createProductDto, admin: {id: adminId},});
+  // async findVendor(productId: number) {
+  //   const product = await this.productRepository.findOne({
+  //     where: { id: productId },
+  //     relations: ['vendor'], 
+  //   });
+  //   if (!product) throw new NotFoundException(`Product with ID ${productId} not found`);
+  //   if (!product.vendor) throw new NotFoundException(`No vendor found for this product`);
+  //   const { name, email } = product.vendor;
+  //   return { name, email }; 
+  // }
+
+  // countAll():Promise<number> {
+  //   return this.productRepository.count();
+  // }
+
+  async create(createProductDto: CreateProductDto, user: any): Promise<{message: string; product: ProductEntity}> {
+    const newProduct = this.productRepository.create({...createProductDto, vendor: {id: user.id},});
     const savedProduct = await this.productRepository.save(newProduct);
     return { message: 'Product created successfully', product: savedProduct};
   }
 
-  async createMany(adminId: number, createProductsDto: CreateProductsDto): Promise<{message: string; products: ProductEntity[]}> {
-    const newProducts = this.productRepository.create(createProductsDto.products.map( product => ({...product, admin: {id: adminId}})));
+  async createMany(createProductsDto: CreateProductsDto, user: any): Promise<{message: string; products: ProductEntity[]}> {
+    const newProducts = this.productRepository.create(createProductsDto.products.map( product => ({...product, vendor: {id: user.id}})));
     const savedProducts = await this.productRepository.save(newProducts);
     return { message: 'Products created successfully', products: savedProducts};
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<{ message: string; product: ProductEntity }> {
-    const product = await this.findOne(id);
-    await this.productRepository.update(id, updateProductDto);
-    return { message: 'Product updated successfully', product: { ...product, ...updateProductDto } };
-  }
+  // // async update(id: number, vendorId: number, updateProductDto: UpdateProductDto): Promise<{ message: string; product: ProductEntity }> {
+  // //   const product = await this.findOne(id);
+    
+  // //   if (product.vendor?.id !== vendorId) {
+  // //     throw new ForbiddenException('You do not have permission to update this product');
+  // //   }
 
-  async remove(id: number): Promise<{ message: string; product: ProductEntity }> {
-    const product = await this.findOne(id);
-    await this.productRepository.delete(id);
-    return { message: 'Product deleted successfully', product: product };
-  }
+  // //   await this.productRepository.update(id, updateProductDto);
+  // //   return { message: 'Product updated successfully', product: { ...product, ...updateProductDto } };
+  // // }
 
-  async searchByName(name: string): Promise<ProductEntity[]> {
-    return this.productRepository.find({ where:{ name: ILike(`%${name}%`) } });
-  }
+  // // async remove(id: number, vendorId: number): Promise<{ message: string; product: ProductEntity }> {
+  // //   const product = await this.findOne(id);
 
-  async findByPriceRange(min: number, max: number): Promise<ProductEntity[]> {
-    return this.productRepository.find({ where:{ price: Between(min, max) } });
-  }
+  // //   if (product.vendor?.id !== vendorId) {
+  // //     throw new ForbiddenException('You do not have permission to delete this product');
+  // //   }
 
-  async findByCategory(category: string): Promise<ProductEntity[]> {
-    return this.productRepository.find({ where: { category } });
-  }
+  // //   await this.productRepository.delete(id);
+  // //   return { message: 'Product deleted successfully', product: product };
+  // // }
 
-  async findTopExpensive(limit = 5): Promise<ProductEntity[]> {
-    return this.productRepository.find({ order: { price: 'DESC' }, take: limit });
-  }
+  // async searchByName(name: string): Promise<ProductEntity[]> {
+  //   return this.productRepository.find({ where:{ name: ILike(`%${name}%`) } });
+  // }
 
-  async countByCategory(): Promise<{ category: string; count: number }[]> {
-    return this.productRepository.createQueryBuilder('product')
-    .select('product.category', 'category')
-    .addSelect('COUNT(product.id)', 'count')
-    .groupBy('product.category')
-    .getRawMany();
-  }
+  // async findByPriceRange(min: number, max: number): Promise<ProductEntity[]> {
+  //   return this.productRepository.find({ where:{ price: Between(min, max) } });
+  // }
+
+  // async findByCategory(category: string): Promise<ProductEntity[]> {
+  //   return this.productRepository.find({ where: { category } });
+  // }
+
+  // async findTopExpensive(limit = 5): Promise<ProductEntity[]> {
+  //   return this.productRepository.find({ order: { price: 'DESC' }, take: limit });
+  // }
+
+
+
+
 
 
 

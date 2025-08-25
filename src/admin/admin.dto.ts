@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, Min } from "class-validator";
+import { IsDateString, IsEmail, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Length, Matches, MaxLength, Min } from "class-validator";
 
 export class CreateAdminDto {
     @IsString()
@@ -27,6 +27,18 @@ export class CreateAdminDto {
     linkedInUrl : string;
 }
 
+export class VerifyEmailDto {
+    @IsNotEmpty({ message: 'Email field is required' })
+    @IsEmail({}, { message: 'Please enter a valid email address' })
+    email: string;
+
+    @IsNotEmpty({ message: 'OTP is required' })
+    @IsString()
+    @Length(3, 3, { message: 'OTP must be exactly 3 digits' })
+    @Matches(/^\d{3}$/, { message: 'OTP must contain only numbers' })
+    otp: string;
+}
+
 export class UpdateAdminDto {
     @IsString()
     @IsOptional()
@@ -43,10 +55,6 @@ export class UpdateAdminDto {
     @IsOptional()
     age?: number;
 
-    @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
-    @IsOptional()
-    password?: string;
-
     // @IsDateString({}, { message: 'Date must be in (YYYY-MM-DD) format' })
     // @IsOptional()
     // joiningDate?: string;
@@ -62,4 +70,22 @@ export class UpdateAdminDto {
 export class UpdateStatusDto {
     @IsIn(['active', 'inactive'],{ message: 'status must be either active or inactive'})
     status: 'active' | 'inactive';
+}
+
+// export class LoginAdminDto {
+//     @IsNotEmpty({ message: 'Email field is required' })
+//     @IsEmail({}, { message: 'Please enter a valid email address (e.g., john@example.com)' })
+//     email : string;
+
+//     @IsNotEmpty({ message: 'Password field is required' })
+//     @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
+//     password : string;
+// }
+
+export class UpdatePasswordDto {
+    @IsString()
+    oldPassword: string;
+
+    @Matches(/[@#$&]/, { message: 'Password must contain at least one special character (@, #, $, &)' })
+    newPassword: string;
 }

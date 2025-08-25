@@ -1,3 +1,4 @@
+import { Role } from "src/auth/enums/role.enum";
 import { ProductEntity } from "src/product/product.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -27,6 +28,6 @@ export class AdminEntity {
   @Column({ type: 'enum', enum: ['active', 'inactive'], default: 'active'})
   status: 'active' | 'inactive';
 
-  @OneToMany(()=> ProductEntity, (product) => product.admin)
-  products: ProductEntity[];
+  @Column({ type: 'enum', enum: Role, default: Role.Admin })
+  role: Role; 
 }
