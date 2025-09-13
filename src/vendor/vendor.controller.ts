@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Param, Body, Put, Delete, Request, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Put, Delete, Request, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { VendorEntity } from './vendor.entity';
 import { CreateVendorDto } from './vendor.dto';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('vendor')
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}

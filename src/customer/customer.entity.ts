@@ -1,22 +1,52 @@
-import { randomUUID } from 'crypto';
-import { BeforeInsert, Entity, Column, PrimaryColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, } from 'typeorm';
+
+export enum CustomerStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+}
 
 @Entity('customer')
 export class CustomerEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({unique:true})
+  email: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  fullName: string | null;
+  @Column()
+  @Exclude()
+  password: string;
 
-  @Column({ type: 'bigint', unsigned: true })
-  phone: number;
+  @Column()
+  firstName: string;
 
-  @BeforeInsert()
-  generateId() {
-    this.id = 'CUS-' + randomUUID().slice(0, 8).toUpperCase();
-  }
+  @Column()
+  lastName: string;
+
+  @Column()
+  phoneNumber: string;
+
+  @Column({ nullable: true })
+  dateOfBirth?: Date;
+
+  @Column({ type: 'enum', enum: CustomerStatus, default: CustomerStatus.ACTIVE })
+  status: CustomerStatus;
+
+  @Column({ nullable: true })
+  address?: string;
+
+  @Column({ nullable: true })
+  city?: string;
+
+  @Column({ nullable: true })
+  postalCode?: string;
+
+  @Column({ nullable: true })
+  country?: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
 }

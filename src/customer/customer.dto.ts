@@ -1,28 +1,58 @@
-import { IsEmail, Matches, IsIn, IsNotEmpty, IsString, MinLength, IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { IsEmail, Matches, IsIn, IsNotEmpty, IsString, MinLength, IsOptional, IsBoolean, IsNumber, MaxLength, IsDateString, IsPhoneNumber } from 'class-validator';
 
 export class CreateCustomerDto {
-  // @IsEmail({}, { message: 'Email must be valid' })
-  // @Matches(/@aiub\.edu$/, { message: 'Email must be from aiub.edu domain' })
-  // email: string;
+  //@ApiProperty({ example: 'john.doe@example.com' })
+  @IsEmail()
+  email: string;
 
-  // @IsString()
-  // @MinLength(6, { message: 'Password must be at least 6 characters' })
-  // @Matches(/[A-Z]/, { message: 'Password must have at least one uppercase letter' })
-  // password: string;
+  //@ApiProperty({ example: 'Password123!', minLength: 8 })
+  @IsString()
+  @MinLength(8)
+  password: string;
 
-  // @IsIn(['male', 'female','others'], { message: 'Gender must be male or female' })
-  // gender: string;
+  //@ApiProperty({ example: 'John' })
+  @IsString()
+  @MaxLength(50)
+  firstName: string;
 
+  //@ApiProperty({ example: 'Doe' })
+  @IsString()
+  @MaxLength(50)
+  lastName: string;
+
+  //@ApiPropertyOptional({ example: '+1234567890' })
+  @IsPhoneNumber()
+  phoneNumber: string;
+
+  //@ApiPropertyOptional({ example: '1990-01-01' })
+  @IsOptional()
+  @IsDateString()
+  dateOfBirth?: string;
+
+  //@ApiPropertyOptional({ example: '123 Main St' })
   @IsOptional()
   @IsString()
-  fullName?: string;
+  @MaxLength(255)
+  address?: string;
 
-  @IsNumber()
-  phone: number;
+  //@ApiPropertyOptional({ example: 'New York' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  city?: string;
 
-  
+  //@ApiPropertyOptional({ example: '10001' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  postalCode?: string;
 
-  // @IsOptional()
-  // @IsBoolean()
-  // isActive?: boolean;
+  //@ApiPropertyOptional({ example: 'USA' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  country?: string;
 }
+
+export class UpdateCustomerDto extends PartialType(CreateCustomerDto) {}

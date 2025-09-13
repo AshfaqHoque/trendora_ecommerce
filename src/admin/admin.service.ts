@@ -64,7 +64,6 @@ export class AdminService {
             otp,
             expiresAt,
         });
-
         await this.mailerService.sendOtpEmail(createAdminDto.email, otp);
 
         return { message: 'OTP sent to your email. Please verify to complete registration.' };

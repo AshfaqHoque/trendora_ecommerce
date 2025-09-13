@@ -22,5 +22,5 @@ export class MailerService {
         });
         return { message: 'Email sent successfully' };
     }
-
 }
+
