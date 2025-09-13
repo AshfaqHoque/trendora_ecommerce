@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { ProductEntity } from 'src/product/product.entity';
+import { ProductEntity } from 'src/product/entities/product.entity';
 import { Role } from 'src/auth/enums/role.enum';
 
 @Entity('vendor')

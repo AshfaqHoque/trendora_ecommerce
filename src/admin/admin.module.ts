@@ -10,7 +10,7 @@ import { PendingAdminEntity } from './entites/pending-registration.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([AdminEntity, PendingAdminEntity]),
-    forwardRef(() => AuthModule),
+    AuthModule,
     MailerModule, 
   ],
   controllers: [AdminController],

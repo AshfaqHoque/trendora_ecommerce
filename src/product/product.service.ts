@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { UpdateProductDto, CreateProductDto, CreateProductsDto } from './product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, ILike, Like, Repository } from 'typeorm';
-import { ProductEntity } from './product.entity';
+import { ProductEntity } from './entities/product.entity';
 import { Role } from 'src/auth/enums/role.enum';
 import { VendorEntity } from 'src/vendor/vendor.entity';
 
