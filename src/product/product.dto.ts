@@ -21,7 +21,15 @@ export class CreateProductDto {
 
     @IsString()
     @IsOptional()
-    category: string;
+    category?: string;
+
+    @IsNumber()
+    @IsOptional()
+    rating?: number;
+
+    @IsString()
+    @IsOptional()
+    image?: string;
 }
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
 

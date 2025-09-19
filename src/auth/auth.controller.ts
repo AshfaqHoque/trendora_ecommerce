@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from './guards/auth.guard';
 import { Response } from 'express';
 import { LoginDto } from './dto/login.dto';
@@ -8,6 +8,12 @@ import { Role } from './enums/role.enum';
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
+
+      @UseGuards(AuthGuard)
+        @Get('verify')
+        verifyToken(@Req() req: Request) {
+            return { valid: true, user: (req as any).user }; // [21][19]
+        }
 
     @Post('/admin/login')
     async loginAdmin(@Body() loginAdminDto: LoginDto, @Res({ passthrough: true }) res: Response) {

@@ -17,7 +17,7 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async login(loginDto: LoginDto, response: Response, role: Role): Promise<{ message: string }> {
+    async login(loginDto: LoginDto, response: Response, role: Role): Promise<{ message: string; id: number  }> {
         let user;
         switch(role) {
             case Role.Admin:
@@ -41,41 +41,16 @@ export class AuthService {
         const token = await this.jwtService.signAsync(payload);
         
         this.setCookie(response, token);
-        return { message: '${role} login successful' };
+        return { message: role + " login successful", id: user.id  };
     }
-
-    // async loginVendor(loginVendorDto: LoginDto, response: Response): Promise<{ message: string }> {
-    //     const vendor = await this.vendorService.findOneByEmail(loginVendorDto.email);
-    //     if (!vendor || !(await bcrypt.compare(loginVendorDto.password, vendor.password))) {
-    //         throw new UnauthorizedException('Invalid credentials');
-    //     }
-        
-    //     const payload = { id: vendor.id, email: vendor.email, role: Role.Vendor };
-    //     const token = await this.jwtService.signAsync(payload);
-        
-    //     this.setCookie(response, token);
-    //     return { message: 'Vendor login successful' };
-    // }
-
-    // async loginCustomer(loginCustomerDto: LoginDto, response: Response): Promise<{ message: string }> {
-    //     const customer = await this.customerService.findOneByEmail(loginCustomerDto.email);
-    //     if (!customer || !(await bcrypt.compare(loginCustomerDto.password, customer.password))) {
-    //         throw new UnauthorizedException('Invalid credentials');
-    //     }
-        
-    //     const payload = { id: customer.id, email: customer.email, role: Role.Customer };
-    //     const token = await this.jwtService.signAsync(payload);
-        
-    //     this.setCookie(response, token);
-    //     return { message: 'Customer login successful' };
-    // }
 
     private setCookie(response: Response, token: string) {
         response.cookie('auth-token', token, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000,
+            path: '/',
         });
     }
 
@@ -83,7 +58,7 @@ export class AuthService {
         response.clearCookie('auth-token', {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none',
         });
         return { message: 'Logout successful' };
     }
@@ -115,5 +90,32 @@ export class AuthService {
 
     // async isTokenBlacklisted(token: string): Promise<boolean> {
     //     return this.tokenBlacklist.has(token);
+    // }
+
+
+        // async loginVendor(loginVendorDto: LoginDto, response: Response): Promise<{ message: string }> {
+    //     const vendor = await this.vendorService.findOneByEmail(loginVendorDto.email);
+    //     if (!vendor || !(await bcrypt.compare(loginVendorDto.password, vendor.password))) {
+    //         throw new UnauthorizedException('Invalid credentials');
+    //     }
+        
+    //     const payload = { id: vendor.id, email: vendor.email, role: Role.Vendor };
+    //     const token = await this.jwtService.signAsync(payload);
+        
+    //     this.setCookie(response, token);
+    //     return { message: 'Vendor login successful' };
+    // }
+
+    // async loginCustomer(loginCustomerDto: LoginDto, response: Response): Promise<{ message: string }> {
+    //     const customer = await this.customerService.findOneByEmail(loginCustomerDto.email);
+    //     if (!customer || !(await bcrypt.compare(loginCustomerDto.password, customer.password))) {
+    //         throw new UnauthorizedException('Invalid credentials');
+    //     }
+        
+    //     const payload = { id: customer.id, email: customer.email, role: Role.Customer };
+    //     const token = await this.jwtService.signAsync(payload);
+        
+    //     this.setCookie(response, token);
+    //     return { message: 'Customer login successful' };
     // }
 

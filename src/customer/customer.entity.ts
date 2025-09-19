@@ -9,8 +9,8 @@ export enum CustomerStatus {
 
 @Entity('customer')
 export class CustomerEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({unique:true})
   email: string;
