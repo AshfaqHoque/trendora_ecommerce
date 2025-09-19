@@ -8,9 +8,13 @@ import { ProductModule } from './product/product.module';
 import { VendorModule } from './vendor/vendor.module';
 import { MailerModule } from './mailer/mailer.module';
 import { ConfigModule } from '@nestjs/config';
+import { OrderModule } from './order/order.module';
+import { NotificationsController } from './notifications/notifications.controller';
+import { PusherService } from './notifications/pusher.service';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
-  imports: [AdminModule, CustomerModule, ProductModule, VendorModule, MailerModule, 
+  imports: [AdminModule, CustomerModule, ProductModule, VendorModule, MailerModule, OrderModule, NotificationsModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

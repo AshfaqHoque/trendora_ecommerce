@@ -43,23 +43,42 @@ export class ProductService {
     throw new ForbiddenException('Access denied');
   }
 
-  async countByVendor(id: number | undefined, user: any): Promise<number> {
-    if (user.roles.includes(Role.Admin)) {
-      if(id && !(await this.vendorRepository.findOne({where: {id}}))) {
-        throw new NotFoundException(`Vendor with ID ${id} not found`);
-      }
-      const condition = id ? { vendor: { id } } : {};
-      return await this.productRepository.count({
-        where: condition,
-      });
-    }
-    if (user.roles.includes(Role.Vendor)) {
-      return await this.productRepository.count({
-        where: { vendor: { id: user.id } },
-      });
-    }
-    throw new ForbiddenException('Access denied');
+  async deleteProduct(productId: number, user: any): Promise<{ message: string }> {
+  const product = await this.productRepository.findOne({
+    where: { id: productId },
+    relations: ['vendor'],
+  });
+
+  if (!product) {
+    throw new NotFoundException(`Product with ID ${productId} not found`);
   }
+
+  if (user.roles.includes(Role.Vendor) && product.vendor.id !== user.id) {
+    throw new ForbiddenException('You can only delete your own products');
+  }
+
+  await this.productRepository.delete(product);
+  return { message: 'Product deleted successfully' };
+}
+
+
+  // async countByVendor(id: number | undefined, user: any): Promise<number> {
+  //   if (user.roles.includes(Role.Admin)) {
+  //     if(id && !(await this.vendorRepository.findOne({where: {id}}))) {
+  //       throw new NotFoundException(`Vendor with ID ${id} not found`);
+  //     }
+  //     const condition = id ? { vendor: { id } } : {};
+  //     return await this.productRepository.count({
+  //       where: condition,
+  //     });
+  //   }
+  //   if (user.roles.includes(Role.Vendor)) {
+  //     return await this.productRepository.count({
+  //       where: { vendor: { id: user.id } },
+  //     });
+  //   }
+  //   throw new ForbiddenException('Access denied');
+  // }
 
   // async findVendor(productId: number) {
   //   const product = await this.productRepository.findOne({
@@ -77,6 +96,12 @@ export class ProductService {
   // }
 
   async create(createProductDto: CreateProductDto, user: any): Promise<{message: string; product: ProductEntity}> {
+    const newProduct = this.productRepository.create({...createProductDto, vendor: {id: user.id},});
+    const savedProduct = await this.productRepository.save(newProduct);
+    return { message: 'Product created successfully', product: savedProduct};
+  }
+
+  async createWithImage(createProductDto: CreateProductDto, user: any): Promise<{message: string; product: ProductEntity}> {
     const newProduct = this.productRepository.create({...createProductDto, vendor: {id: user.id},});
     const savedProduct = await this.productRepository.save(newProduct);
     return { message: 'Product created successfully', product: savedProduct};

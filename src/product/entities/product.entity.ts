@@ -23,6 +23,12 @@ export class ProductEntity {
     @Column({ nullable: true })
     category: string;
 
+    @Column({ nullable: true })
+    rating: number;
+
+    @Column({ nullable: true })
+    image?: string; 
+
     @ManyToOne(() => VendorEntity, (vendor) => vendor.products, { onDelete: 'SET NULL' })
     vendor: VendorEntity;
 }

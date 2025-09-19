@@ -13,11 +13,6 @@ export class AdminController {
     ) {}
     
 
-    // @Post('send-welcome-mail')
-    // sendMail(@Body('email') email: string) {
-    //     return this.mailerService.sendWelcomeEmail(email);
-    // }
-
     @UseGuards(AuthGuard)
     @Get() 
     getAllAdmins() {
@@ -25,15 +20,17 @@ export class AdminController {
     }
 
     @UseGuards(AuthGuard)
-    @Get(':id') 
+    @Get('id/:id') 
     getOneAdmin(@Param('id', ParseIntPipe) id: number) {
         return this.adminService.findOneById(id);
     }
 
-    // @Post() 
-    // createAdmin(@Body() createAdminDto: CreateAdminDto) {
-    //     return this.adminService.create(createAdminDto);
-    // }
+    @UseGuards(AuthGuard)
+    @Get('email/:email') 
+    getAdminByEmail(@Param('email') email: string) {
+        return this.adminService.findOneByEmail(email);
+    }
+
 
     @Post('register')
     requestRegistration(@Body() createAdminDto: CreateAdminDto) {
@@ -82,13 +79,4 @@ export class AdminController {
         return this.adminService.findOlderThan(age);
     }   
 
-    // @Post('/login')
-    // loginAdmin(@Body() loginAdminDto:LoginAdminDto) {
-    //     return this.authService.login(loginAdminDto);
-    // }
-
-    // @Post('/logout')
-    // logout() {
-    //     return this.authService.logout();
-    // }
 }

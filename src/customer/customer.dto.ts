@@ -22,7 +22,7 @@ export class CreateCustomerDto {
   lastName: string;
 
   //@ApiPropertyOptional({ example: '+1234567890' })
-  @IsPhoneNumber()
+  @IsPhoneNumber('BD')
   phoneNumber: string;
 
   //@ApiPropertyOptional({ example: '1990-01-01' })

@@ -64,7 +64,8 @@ export class UpdateAdminDto {
     linkedInUrl?: string;
 
     @IsIn(['active', 'inactive'],{ message: 'status must be either active or inactive'})
-    status: 'active' | 'inactive';
+    @IsOptional()
+    status?: 'active' | 'inactive';
 }
 
 export class UpdateStatusDto {

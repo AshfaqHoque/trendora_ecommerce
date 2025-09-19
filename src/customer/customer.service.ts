@@ -17,7 +17,7 @@ export class CustomerService {
       return this.customerRepository.find();
     }
   
-  async findOne(id: string): Promise<CustomerEntity> {
+  async findOne(id: number): Promise<CustomerEntity> {
     const customer = await this.customerRepository.findOne({where: { id }});
 
     if (!customer) {
@@ -43,7 +43,7 @@ export class CustomerService {
     return { message: 'customer created successfully', customer: newcustomer};
   }
 
-  async remove(id: string | undefined, user: any): Promise<{ message: string }> {
+  async remove(id: number | undefined, user: any): Promise<{ message: string }> {
     if (user.roles.includes(Role.Admin)) {
       if (!id) {
         throw new BadRequestException('Admin must provide customer ID to delete');
