@@ -5,6 +5,7 @@ import { Between, ILike, Like, Repository } from 'typeorm';
 import { ProductEntity } from './entities/product.entity';
 import { Role } from 'src/auth/enums/role.enum';
 import { VendorEntity } from 'src/vendor/vendor.entity';
+import { ProductStatus } from './enums/product-status.enum';
 
 @Injectable()
 export class ProductService {
@@ -57,7 +58,7 @@ export class ProductService {
     throw new ForbiddenException('You can only delete your own products');
   }
 
-  await this.productRepository.delete(product);
+  await this.productRepository.delete(product.id);
   return { message: 'Product deleted successfully' };
 }
 
@@ -150,6 +151,26 @@ export class ProductService {
   // async findTopExpensive(limit = 5): Promise<ProductEntity[]> {
   //   return this.productRepository.find({ order: { price: 'DESC' }, take: limit });
   // }
+async setInactive(productId: number, user: any): Promise<{ message: string; product: ProductEntity }> {
+  const product = await this.productRepository.findOne({
+    where: { id: productId },
+    relations: ['vendor'],
+  });
+
+  if (!product) {
+    throw new NotFoundException(`Product with ID ${productId} not found`);
+  }
+
+  if (user.roles.includes(Role.Vendor) && product.vendor.id !== user.id) {
+    throw new ForbiddenException('You can only update your own products');
+  }
+
+  product.status = ProductStatus.INACTIVE;
+  const updatedProduct = await this.productRepository.save(product);
+
+  return { message: 'Product status updated to inactive', product: updatedProduct };
+}
+
 
 
 

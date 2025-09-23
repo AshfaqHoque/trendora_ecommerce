@@ -1,5 +1,6 @@
 import { VendorEntity } from "src/vendor/vendor.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ProductStatus } from "../enums/product-status.enum";
 
 
 @Entity('product')
@@ -29,6 +30,9 @@ export class ProductEntity {
     @Column({ nullable: true })
     image?: string; 
 
+    @Column({ type: 'enum', enum: ProductStatus, default: ProductStatus.ACTIVE })
+    status: ProductStatus;
+    
     @ManyToOne(() => VendorEntity, (vendor) => vendor.products, { onDelete: 'SET NULL' })
     vendor: VendorEntity;
 }

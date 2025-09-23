@@ -10,14 +10,25 @@ import { AuthGuard } from "src/auth/guards/auth.guard";
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @Roles(Role.Admin)
+  @Get('top-customers')
+  async getTopCustomers() { 
+    return this.orderService.getTopCustomers();
+  }
+
   @Post('/create-my-order')
   createOrder(@Body() body: { customerId: number; items: { productId: number; quantity: number }[] }) {
     return this.orderService.createOrder(body.customerId, body.items);
   }
 
+  @Get('order-status-summary')
+  async getOrderStatusSummary() {
+    return this.orderService.getOrderStatusSummary();
+  }
+
   @Roles(Role.Admin)
   @Delete(':id')
-  async deleteOrder(@Param('id') id: string) {
+  deleteOrder(@Param('id') id: string) {
     const orderId = parseInt(id, 10);
     return this.orderService.deleteOrder(orderId);
   }
@@ -65,6 +76,8 @@ export class OrderController {
   ) {
     return this.orderService.updateOrderStatus(id, status);
   }
+
+
 
 
 

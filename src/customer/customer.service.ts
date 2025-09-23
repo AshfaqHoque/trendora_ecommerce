@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull } from 'typeorm';
+import { Repository, IsNull, Between } from 'typeorm';
 import { CustomerEntity } from './customer.entity';
 import { CreateCustomerDto } from './customer.dto';
 import * as bcrypt from 'bcrypt';
@@ -61,5 +61,43 @@ export class CustomerService {
     }
     throw new ForbiddenException('Access denied');
   }
+
+  async countAll(): Promise<number> {
+    return await this.customerRepository.count();
+  }
+
+  async getTotalCustomersPerYear() {
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+  const growthPercentage = await this.getCustomerYearOverYearGrowth(currentYear, previousYear);
+  const totalCustomers = await this.getYearlyCustomers(currentYear);
+  return {
+    totalCustomers,
+    customerGrowth: Math.round(growthPercentage * 100) / 100 // 2 decimal places
+  };
+}
+
+async getCustomerYearOverYearGrowth(currentYear: number, previousYear: number) {
+  const currentYearCustomers = await this.getYearlyCustomers(currentYear);
+  const previousYearCustomers = await this.getYearlyCustomers(previousYear);
+
+  if (previousYearCustomers === 0) return currentYearCustomers > 0 ? 100 : 0;
+  
+  return ((currentYearCustomers - previousYearCustomers) / previousYearCustomers) * 100;
+}
+
+async getYearlyCustomers(year: number): Promise<number> {
+  const startDate = new Date(year, 0, 1);
+  const endDate = new Date(year, 11, 31, 23, 59, 59, 999);
+
+  const count = await this.customerRepository.count({
+    where: {
+      createdAt: Between(startDate, endDate)
+    }
+  });
+
+  return count;
+}
+
 
 }

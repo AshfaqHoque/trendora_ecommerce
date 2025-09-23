@@ -16,6 +16,17 @@ export class CustomerController {
     findAll() {
       return this.customerService.findAll();
     }
+
+    @Get('count')
+    countAll() {
+      return this.customerService.countAll();
+    }
+
+    //@Roles(Role.Admin)
+    @Get('total-customers')
+    getTotalCustomers() {
+      return this.customerService.getTotalCustomersPerYear();
+    }
   
     @Get(':id')
     findOne(@Param('id', new ParseIntPipe()) id: number) {
@@ -26,7 +37,7 @@ export class CustomerController {
     create(@Body()createCustomerDto:CreateCustomerDto) {
       return this.customerService.create(createCustomerDto);
     }
-  
+
     // @Put('update')
     // update(@Request() req, @Body()CreateCustomerDto:CreateCustomerDto): Promise<CustomerEntity> {
     //   return this.customerService.update(req,CreateCustomerDto);

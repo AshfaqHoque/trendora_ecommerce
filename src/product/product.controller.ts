@@ -12,6 +12,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Put('/:id')
+  @Roles(Role.Admin, Role.Vendor)
+  setInactive(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.productService.setInactive(id, req.user);
+  }
+
   @Get() 
   getAllProducts() {
     return this.productService.findAll();
@@ -109,6 +116,8 @@ export class ProductController {
   // removeProduct(@Param('id') id: string) {
   //   return this.productService.remove(+id);
   // }
+
+
 
 
 
